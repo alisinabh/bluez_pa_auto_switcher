@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-@apps = ["Firefox", "Chromium", "Skype", "ZOOM VoiceEngine", "WEBRTC VoiceEngine", "Google Chrome", "Microsoft Teams - Preview"]
+require 'rubygems'
+require 'yaml'
 
 def get_card_info
   info = `pactl list cards`
@@ -40,11 +41,13 @@ def switch
     end
   else
     puts "Bluetooth sink not found!"
+    sleep 1
+    return
   end
 
   while true
     sinks = get_sink_input_info()
-    sink = sinks.find { |s| @apps.include?(s[1]["Properties"]["application.name"]) } 
+    sink = sinks.find { |s| @config["validClients"].include?(s[1]["Properties"]["application.name"]) } 
     if sink == nil
       puts "Sink use finished! Switching back..."
       break
@@ -118,7 +121,7 @@ def should_switch(client)
   if client != nil and client["Properties"] != nil
     app_name = client["Properties"]["application.name"]
     puts "Checking request by #{app_name}"
-    @apps.include?(app_name)
+    @config["validClients"].include?(app_name)
   else
     false
   end
@@ -144,6 +147,22 @@ def subscribe_to_pa
     end
   end
 end
+
+@config_files = ["config.yaml", "~/.config/bluez_pa_auto_switcher/config.yaml", "/etc/bluez_pa_auto_switcher/config.yaml"]
+
+def load_config
+  for file in @config_files
+    if File.exist?(file)
+      return YAML.load_file(file)
+    end
+  end
+
+  puts "No config files detected... Using defaults!"
+
+  return {"validClients" =>  ["Firefox", "Chromium", "Skype", "ZOOM VoiceEngine", "WEBRTC VoiceEngine", "Google Chrome", "Microsoft Teams - Preview"]}
+end
+
+@config = load_config()
 
 while true
   subscribe_to_pa()

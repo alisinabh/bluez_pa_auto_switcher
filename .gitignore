@@ -1,0 +1,5 @@
+/pkg
+/src
+/bluez_pa_auto_switcher
+
+*.tar.zst
