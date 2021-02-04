@@ -3,7 +3,7 @@ Description=Bluez Pulse Audio auto profile switcher for headsets.
 
 [Service]
 Type=simple
-ExecStart=/opt/bluez_pa_auto_switcher/bluez_pa_auto_switcher.rb
+ExecStart=/bin/bash -c "/home/$USER/.bluez_pa_auto_switcher/bluez_pa_auto_switcher.rb"
 
 [Install]
 WantedBy=multi-user.target

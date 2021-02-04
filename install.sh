@@ -1,5 +1,20 @@
-#!/bin/bash -e
+#!/bin/bash
 
+which ruby >> /dev/null
+
+if [ $? != 0 ]; then
+  echo ""
+  echo -e "\033[0;31mRuby not found!\033[0m Install it then run the script again."
+  echo "https://www.ruby-lang.org/en/documentation/installation/#package-management-systems"
+  exit 1
+fi
+
+if [ $USER -eq "root" ]; then
+  echo ""
+  echo -e "\033[0;31mRunning as root detected!\033[0m If you are not logged-in with root user this will NOT work."
+  echo "Please run this as your regular user (Without sudo)"
+  echo ""
+fi
 
 if test -f "/home/$USER/.bluez_pa_auto_switcher/bluez_pa_auto_switcher.rb"; then
   echo "It looks like bluez_pa_auto_switcher is already installed for this user. Are you sure you want to reinstall it (y/n)?"
