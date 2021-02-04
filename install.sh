@@ -1,6 +1,22 @@
 #!/bin/bash -e
 
 
+if test -f "/home/$USER/.bluez_pa_auto_switcher/bluez_pa_auto_switcher.rb"; then
+  echo "It looks like bluez_pa_auto_switcher is already installed for this user. Are you sure you want to reinstall it (y/n)?"
+  read answer
+
+  case ${answer:0:1} in
+    y|Y )
+      rm -Rf ~/.bluez_pa_auto_switcher
+      rm ~/.config/systemd/user/bluez_pa_auto_switcher.service
+    ;;
+    * )
+      echo -e "\033[0;31mCancelled\033[0m You answered: $answer"
+      exit 1
+    ;;
+  esac
+fi
+
 if test -f "./bluez_pa_auto_switcher.rb"; then
   echo "SKIPPING DOWNLOAD bluez_pa_auto_switcher.rb found! Using current directory for the files."
   mkdir -p ~/.bluez_pa_auto_switcher

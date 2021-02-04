@@ -165,5 +165,10 @@ end
 @config = load_config()
 
 while true
-  subscribe_to_pa()
+  begin
+    subscribe_to_pa()
+  rescue => e
+    puts "Error #{e}"
+  end
+  sleep 5
 end
