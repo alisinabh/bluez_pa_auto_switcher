@@ -41,6 +41,13 @@ else
   git clone https://github.com/alisinabh/bluez_pa_auto_switcher ~/.bluez_pa_auto_switcher
 fi
 
+if test -d "$HOME/.config/bluez_pa_auto_switcher"; then
+  echo "Configuration folder already exists! Skipping..."
+else
+  mkdir -p $HOME/.config/bluez_pa_auto_switcher
+  cp ./config.yaml $HOME/.config/bluez_pa_auto_switcher
+fi
+
 cd ~/.bluez_pa_auto_switcher
 
 echo "Files installed successfully in ~/.bluez_pa_auto_switcher"
