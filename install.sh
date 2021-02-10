@@ -16,6 +16,9 @@ if [ "$USER" == "root" ]; then
   echo ""
 fi
 
+# set -e so from here on error causes halt to entire script
+set -e
+
 if test -f "/home/$USER/.bluez_pa_auto_switcher/bluez_pa_auto_switcher.rb"; then
   echo "It looks like bluez_pa_auto_switcher is already installed for this user. Are you sure you want to reinstall it (y/n)?"
   read answer
