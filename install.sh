@@ -9,7 +9,7 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-if [ $USER -eq "root" ]; then
+if [ "$USER" == "root" ]; then
   echo ""
   echo -e "\033[0;31mRunning as root detected!\033[0m If you are not logged-in with root user this will NOT work."
   echo "Please run this as your regular user (Without sudo)"
