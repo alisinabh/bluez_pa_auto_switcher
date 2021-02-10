@@ -16,7 +16,7 @@ after boot/login should work.
 To install it simply run the following command:
 
 ```bash
-curl https://raw.githubusercontent.com/alisinabh/bluez_pa_auto_switcher/main/install.sh | bash
+bash -c "$(curl -sSL https://raw.githubusercontent.com/alisinabh/bluez_pa_auto_switcher/main/install.sh)"
 ```
 
 Or you can just clone and run the `bluez_pa_auto_switcher.rb` file manually.
