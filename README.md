@@ -2,6 +2,12 @@
 
 Automatically switches A2DP/HSP/HFP when a microphone is needed in Linux and pulseaudio. Just run the installation script and you are ready to go!
 
+## Requirements
+
+ - `pactl`: The pactl executable should be available.
+ - `ruby`: `>= 2.0.0` should work. Tested with `2.7.2`
+ - `pipewire-pulse`: **Optional** if you are using pipewire.
+
 ## Installation
 
 You can use the provided `install.sh` in all distros with systemd and pulseaudio on them. If you don't have systemd then just running `bluez_pa_auto_switcher.rb'
@@ -17,8 +23,7 @@ Or you can just clone and run the `bluez_pa_auto_switcher.rb` file manually.
 
 ## Configuration
 
-You can edit the `~/.config/bluez_pa_auto_switcher/config.yaml` file to change the configuration. After changing the config remember to restart the service using
-`systemctl --user restart bluez_pa_auto_switcher` command.
+You can edit the `~/.config/bluez_pa_auto_switcher/config.yaml` file to change the configuration.
 
  - `validClients`: A list of application names to support auto switching for.
 
