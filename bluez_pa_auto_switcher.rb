@@ -32,11 +32,15 @@ def count_indent(str)
   str.chars.count { |char| char == "\t" }
 end
 
-def switch
+def has_bluetooth_sink?(card = nil)
+  get_blues_card() != nil
+end
+
+def switch(client_id)
   card = get_blues_card()
 
   if card != nil
-    if not system("pactl set-card-profile #{card["Name"]} headset_head_unit")
+    if not system("pactl set-card-profile #{card["Name"]} #{@config["inputCardProfile"] || "headset_head_unit"}")
       raise "Cannot set card profile. Non zero exit code!"
     end
   else
@@ -45,18 +49,21 @@ def switch
     return
   end
 
+  sleep(2)
+
   while true
     sinks = get_sink_input_info()
-    sink = sinks.find { |s| @config["validClients"].include?(s[1]["Properties"]["application.name"]) } 
+    sink = sinks.find { |s| s[0].end_with?(client_id) } 
     if sink == nil
       puts "Sink use finished! Switching back..."
       break
     end
-    puts "Sink in use: #{sink[1]["Properties"]["application.name"]}"
+    puts "Sink in use: #{sink[0]} (#{sink[1]["Properties"]["application.name"]})"
     sleep 1
   end
 
-  system("pactl set-card-profile #{card["Name"]} a2dp_sink")
+  `zenity --notification --text="Switching profile of bluetooth headset back to A2DP."`
+  system("pactl set-card-profile #{card["Name"]} #{@config["normalCardProfile"] || "a2dp_sink"}")
 end
 
 def parse_tabbed_info(lines)
@@ -116,12 +123,37 @@ def select_in_indent(lines, start)
   return lines[start + 1, end_at - start - 1]
 end
 
-
 def should_switch(client)
+  if not has_bluetooth_sink?()
+    puts "Bluetooth sink not found"
+    return false
+  end
+
   if client != nil and client["Properties"] != nil
     app_name = client["Properties"]["application.name"]
     puts "Checking request by #{app_name}"
-    @config["validClients"].include?(app_name)
+    if (@config["invalidClients"] || {}).include?(app_name)
+      puts "#{app_name} is in invalidClients blacklist"
+      return false
+    else
+      res = `zenity --title="Bluetooth headset mic requested" --list --column="Action ID" --column="Choose action" "1" "Switch to HSP/HFP" "2" "Not this time" "3" "Never for #{app_name}" --hide-column=1`
+      res = res.strip
+
+      case res
+      when "1"
+        puts "Request accepted #{app_name}"
+        return true
+      when "2"
+        puts "Request rejected just this time #{app_name}"
+        sleep(3)
+        return false
+      when "3"
+        puts "#{app_name} Blacklist request"
+        add_invalid_client(app_name)
+        return false
+      end
+    end
+
   else
     false
   end
@@ -136,12 +168,12 @@ def subscribe_to_pa
     line = f.readline
   
     if line.include?("sink-input")
-      client_name = line[line.index("#")..-1].strip
-      client = get_sink_input_info()["Sink Input #{client_name}"]
+      client_id = line[line.index("#")..-1].strip
+      client = get_sink_input_info()["Sink Input #{client_id}"]
       if should_switch(client)
         puts "Sink requested by #{client["Properties"]["application.name"]}!"
         Process.kill(9, f.pid)
-        switch()
+        switch(client_id)
         f = IO.popen("pactl subscribe")
       end
     end
@@ -150,16 +182,38 @@ end
 
 @config_files = ["config.yaml", "~/.config/bluez_pa_auto_switcher/config.yaml", "/etc/bluez_pa_auto_switcher/config.yaml"]
 
-def load_config
+def get_config_file
   for file in @config_files
     if File.exist?(file)
-      return YAML.load_file(file)
+      return file
     end
   end
 
-  puts "No config files detected... Using defaults!"
+  return nil
 
-  return {"validClients" =>  ["Firefox", "Chromium", "Skype", "ZOOM VoiceEngine", "WEBRTC VoiceEngine", "Google Chrome", "Microsoft Teams - Preview"]}
+end
+
+def load_config
+  file = get_config_file()
+  if file != nil
+    puts "Loading config from #{file}"
+    return YAML.load_file(file)
+  else
+    puts "No config files detected... Using defaults!"
+
+    return {"invalidClients" =>  []}
+  end
+end
+
+def add_invalid_client(client_name)
+  if not @config["invalidClients"].include?("client_name")
+    @config["invalidClients"].append(client_name) 
+    dst_config = get_config_file() || "config.yaml" 
+    File.open(dst_config, "w") {|f| f.write @config.to_yaml }
+    puts "Wrote new config to #{dst_config}"
+  else
+    puts "#{client_name} already included"
+  end
 end
 
 @config = load_config()

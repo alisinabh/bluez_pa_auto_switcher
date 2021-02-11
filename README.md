@@ -7,6 +7,7 @@ Automatically switches A2DP/HSP/HFP when a microphone is needed in Linux and pul
  - `pactl`: The pactl executable should be available.
  - `ruby`: `>= 2.0.0` should work. Tested with `2.7.2`
  - `pipewire-pulse`: **Optional** if you are using pipewire.
+ - `zenity`: To ask before switching.
 
 ## Installation
 
@@ -23,9 +24,9 @@ Or you can just clone and run the `bluez_pa_auto_switcher.rb` file manually.
 
 ## Configuration
 
-You can edit the `~/.config/bluez_pa_auto_switcher/config.yaml` file to change the configuration.
+You can edit the `~/.config/bluez_pa_auto_switcher/config.yaml` file to change the configuration. For example you can unblock an app which you have blocked by removing it from the config file.
 
- - `validClients`: A list of application names to support auto switching for.
+ - `invalidClients`: A list of application names to disable the auto switching prompt for. Apps will be added to this list when you choose `Never For APP` from the prompt automatically.
 
 After changing configuration you will need to restart the service using systemd.
 

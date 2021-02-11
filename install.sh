@@ -9,6 +9,15 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+which zenity >> /dev/null
+
+if [ $? != 0 ]; then
+  echo ""
+  echo -e "\033[0;31mZenity not found!\033[0m Please install zenity for your distro."
+  echo "For example: sudo apt-get install -y zenity"
+  exit 1
+fi
+
 if [ "$USER" == "root" ]; then
   echo ""
   echo -e "\033[0;31mRunning as root detected!\033[0m If you are not logged-in with root user this will NOT work."
