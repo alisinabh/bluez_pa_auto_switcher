@@ -1,9 +1,4 @@
-validClients:
-  - Chromium
-  - Firefox
-  - Chromium
-  - Skype
-  - ZOOM VoiceEngine
-  - WEBRTC VoiceEngine
-  - Google Chrome
-  - Microsoft Teams - Preview
+---
+invalidClients: []
+inputCardProfile: headset_head_unit
+normalCardProfile: a2dp_sink
